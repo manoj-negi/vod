@@ -5,10 +5,10 @@ import (
 
 	"log/slog"
 
-	"github.com/tiktok/api"
-	conn "github.com/tiktok/config/database"
-	db "github.com/tiktok/db/sqlc"
-	util "github.com/tiktok/utils"
+	"github.com/vod/api"
+	conn "github.com/vod/config/database"
+	db "github.com/vod/db/sqlc"
+	util "github.com/vod/utils"
 )
 
 func main() {

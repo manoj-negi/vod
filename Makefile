@@ -1,4 +1,4 @@
-DB_URL=postgresql://postgres:123456@localhost:5432/tiktok?sslmode=disable
+DB_URL=postgresql://postgres:123456@localhost:5432/vod?sslmode=disable
 
 network:
 	docker network create bank-network

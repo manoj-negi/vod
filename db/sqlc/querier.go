@@ -11,10 +11,9 @@ import (
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateVideo(ctx context.Context, arg CreateVideoParams) (Video, error)
-	DeleteUser(ctx context.Context, id int32) error
-	GetUser(ctx context.Context, id int32) (User, error)
-	ListUsers(ctx context.Context) ([]User, error)
+	GetUser(ctx context.Context, username string) (User, error)
 	ListVideos(ctx context.Context, name string) ([]ListVideosRow, error)
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

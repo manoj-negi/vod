@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	db "github.com/tiktok/db/sqlc"
-	util "github.com/tiktok/utils"
+	db "github.com/vod/db/sqlc"
+	util "github.com/vod/utils"
 )
 
 // Server serves HTTP requests for our banking service.
@@ -31,6 +31,11 @@ func NewServer(store db.Querier, config util.Config) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := mux.NewRouter()
+
+	router.HandleFunc("/users", server.createUser)
+	router.HandleFunc("/users/login", server.loginUser)
+	router.HandleFunc("/tokens/renew_access", server.refreshToken)
+
 	router.HandleFunc("/upload/video", server.uploadVideoToS3).Methods("POST")
 	router.HandleFunc("/videos", server.listAllVideos).Methods("GET")
 	server.router = router

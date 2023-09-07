@@ -1,4 +1,4 @@
-module github.com/tiktok
+module github.com/vod
 
 go 1.19
 

@@ -1,9 +1,9 @@
 CREATE TABLE "users" (
-  "id" SERIAL PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL,
-  "bio" varchar,
-  "is_active" boolean DEFAULT true,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now())
+  "username" varchar PRIMARY KEY,
+  "hashed_password" varchar NOT NULL,
+  "full_name" varchar NOT NULL,
+  "email" varchar UNIQUE NOT NULL,
+  "password_changed_at" timestamptz NOT NULL DEFAULT('0001-01-01 00:00:00Z'),  
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 

@@ -5,16 +5,18 @@
 package db
 
 import (
+	"time"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type User struct {
-	ID        int32            `json:"id"`
-	Name      string           `json:"name"`
-	Bio       pgtype.Text      `json:"bio"`
-	IsActive  pgtype.Bool      `json:"is_active"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	Username          string    `json:"username"`
+	HashedPassword    string    `json:"hashed_password"`
+	FullName          string    `json:"full_name"`
+	Email             string    `json:"email"`
+	PasswordChangedAt time.Time `json:"password_changed_at"`
+	CreatedAt         time.Time `json:"created_at"`
 }
 
 type Video struct {

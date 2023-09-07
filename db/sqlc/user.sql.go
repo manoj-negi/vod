@@ -13,89 +13,96 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-  name, bio
+  username,
+  hashed_password,
+  full_name,
+  email
 ) VALUES (
-  $1, $2
-)
-RETURNING id, name, bio, is_active, created_at, updated_at
+  $1, $2, $3, $4
+) RETURNING username, hashed_password, full_name, email, password_changed_at, created_at
 `
 
 type CreateUserParams struct {
-	Name string      `json:"name"`
-	Bio  pgtype.Text `json:"bio"`
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	FullName       string `json:"full_name"`
+	Email          string `json:"email"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Bio)
+	row := q.db.QueryRow(ctx, createUser,
+		arg.Username,
+		arg.HashedPassword,
+		arg.FullName,
+		arg.Email,
+	)
 	var i User
 	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Bio,
-		&i.IsActive,
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users
-WHERE id = $1
-`
-
-func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
-	_, err := q.db.Exec(ctx, deleteUser, id)
-	return err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, bio, is_active, created_at, updated_at FROM users
-WHERE id = $1 LIMIT 1
+SELECT username, hashed_password, full_name, email, password_changed_at, created_at FROM users
+WHERE username = $1 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int32) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, username)
 	var i User
 	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Bio,
-		&i.IsActive,
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
 		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
 
-const listUsers = `-- name: ListUsers :many
-SELECT id, name, bio, is_active, created_at, updated_at FROM users
-ORDER BY name
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET
+  hashed_password = COALESCE($1, hashed_password),
+  password_changed_at = COALESCE($2, password_changed_at),
+  full_name = COALESCE($3, full_name),
+  email = COALESCE($4, email)
+WHERE
+  username = $5
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at
 `
 
-func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.Query(ctx, listUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []User{}
-	for rows.Next() {
-		var i User
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Bio,
-			&i.IsActive,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type UpdateUserParams struct {
+	HashedPassword    pgtype.Text        `json:"hashed_password"`
+	PasswordChangedAt pgtype.Timestamptz `json:"password_changed_at"`
+	FullName          pgtype.Text        `json:"full_name"`
+	Email             pgtype.Text        `json:"email"`
+	Username          string             `json:"username"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.HashedPassword,
+		arg.PasswordChangedAt,
+		arg.FullName,
+		arg.Email,
+		arg.Username,
+	)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+	)
+	return i, err
 }
