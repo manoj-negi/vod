@@ -146,6 +146,7 @@ func (server *Server) uploadVideoToS3(w http.ResponseWriter, r *http.Request) {
 
 	video, err := server.store.CreateVideo(ctx, arg)
 	if err != nil {
+		fmt.Println(err)
 		errorResponse(w, http.StatusInternalServerError, "Failed to insert video name into PostgreSQL")
 		return
 	}
